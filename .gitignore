@@ -5,3 +5,6 @@ __pycache__
 *.pyc
 captures_frames_multiview/*
 *.pkl
+total_experiments_analysi
+total_experiments_analysis/*
+exp
