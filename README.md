@@ -5,6 +5,37 @@
 This project implements a **projector-based physical adversarial patch attack** pipeline.  
 A latent-space patch is optimised to fool image classifiers when projected onto a real-world scene, then evaluated via live camera inference.
 
+![Projector-based adversarial attack on everyday objects across viewpoints](docs/assets/teaser.jpg)
+> **Our method in action.** A lightweight projection framework enables robust adversarial attacks through rapid calibration **(15 seconds, 33 patterns)** and real-time adaptation under viewpoint and scene changes.
+
+### Overview Video
+<video src="docs/assets/demo_video.mp4" controls="controls" muted="muted" playsinline="playsinline"></video>
+
+## Abstract
+Projector-based physical adversarial attacks offer a contact-free and reconfigurable way to manipulate camera inputs, but prior work often either relies on lengthy calibration or overstates real-world generality. We present a projector-camera attack pipeline for indoor settings with local planar, mostly diffuse target regions. Our method uses 33 projected calibration patterns and less than 15 seconds of capture to fit a differentiable per-pixel photometric model and an ArUco-based geometric mapping, then optimizes latent-space patches across viewpoints, models, and sensor-like augmentations.
+Relative to the learned PCNet surrogate used by CAPAA, our results show lower reconstruction error (0.077±0.052 vs. 0.120±0.062 RMSE), 33 rather than 500 calibration patterns, and under 1 second rather than roughly 1800 seconds of simulator fitting on the same machine. In physical evaluation across five objects and five novel viewpoints, combined attack success reaches 86.8% on seen models, 79.7% on a DINOv2-based classifier, and 71.7% on unseen models; ablations show that removing simulation or multi-view training sharply degrades performance.
+We do not claim outdoor viability or human imperceptibility. Instead, we frame the system as a credible indoor white-box threat, state the assumptions explicitly, analyze failure modes, and discuss defenses such as projection-aware training, temporal light-signature checks, and multi-view consistency tests.
+
+## Pipeline
+![Three-stage attack pipeline overview](docs/assets/pipeline3.png)
+
+**Attack Pipeline.** Left: A patch location is selected and an ArUco marker is projected while capturing a short multi-view video, followed by projecting 33 flat color patterns for photometric calibration. Middle: A latent vector is optimized using a downstream classifier under attack by simulating how the decoded patch would appear in camera-space under viewpoint changes and the full project-and-capture process. Right: The optimized patch is projected onto the target, causing the downstream classifier to fail; the attack is robust to viewpoint and object changes.
+
+### Simulator Fidelity
+![Qualitative simulation comparison](docs/assets/sim_supp_small.jpg)
+
+**Qualitative Simulation Results.** Various patterns are Projected on a surface and Captured. The process is simulated using PCNet (CAPAA) and our affine model.
+
+### Physical Attack Success
+![Bar charts comparing attack success rates](docs/assets/all_methods_comparison.png)
+
+**Quantitative Comparisons.** Attack success rates vs. CAPAA and a random Gaussian baseline over 5 scenes and 5 novel viewpoints (20 captures per viewpoint). Seen: classifiers used during optimization; DINO: DINOv2-ViT-L14; Unseen: 5 classifiers not used during optimization.
+
+## Dynamic Object Attack
+![Dynamic attack on a moving remote-controlled vehicle](docs/assets/dynamic.jpg)
+
+**Dynamic Scenario.** The optimized patch is reprojected onto a moving remote-controlled vehicle using real-time tracking (YOLOv11 + SIFT + RANSAC). The attack maintains alignment under slow motion; effectiveness degrades under rapid movement.
+
 ---
 
 ## Repository layout
